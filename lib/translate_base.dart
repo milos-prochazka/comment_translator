@@ -1,0 +1,114 @@
+import 'dart:convert';
+import 'dart:io' as io;
+
+class TranslateLanguage
+{
+  String sourceLanguage = '';
+  String destLanguage = '';
+
+  String get languagePairName => '$sourceLanguage###$destLanguage';
+
+  final translate = <String, String>{};
+
+  TranslateLanguage();
+
+  factory TranslateLanguage.fromJson(Map<String, dynamic> srcJson)
+  {
+    final result = TranslateLanguage();
+
+    result.sourceLanguage = srcJson['sourceLanguage'];
+    result.destLanguage = srcJson['destLanguage'];
+
+    for (final trItem in (srcJson['translate'] as Map<String, dynamic>).entries)
+    {
+      result.translate[trItem.key] = trItem.value;
+    }
+
+    return result;
+  }
+
+  TranslateLanguage.reverse(TranslateLanguage src)
+  {
+    sourceLanguage = src.destLanguage;
+    destLanguage = src.sourceLanguage;
+
+    for (final trItem in src.translate.entries)
+    {
+      translate[trItem.value] = trItem.key;
+    }
+  }
+
+  merge(TranslateLanguage src)
+  {
+    if (languagePairName == src.languagePairName)
+    {
+      for (final trItem in src.translate.entries)
+      {
+        translate[trItem.key] = trItem.value;
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() =>
+  <String, dynamic>{'sourceLanguage': sourceLanguage, 'destLanguage': destLanguage, 'translate': translate};
+}
+
+class Translator
+{
+  final languages = <String, TranslateLanguage>{};
+
+  Translator();
+
+  factory Translator.fromJson(Map<String, dynamic> srcJson)
+  {
+    final result = Translator();
+    final version = srcJson['version'];
+    final langList = srcJson['data'];
+
+    for (final item in langList)
+    {
+      final language = TranslateLanguage.fromJson(item);
+      result.languages[language.languagePairName] = language;
+    }
+
+    return result;
+  }
+
+  factory Translator.fromFile(String fileName)
+  {
+    final file = io.File(fileName);
+    final strJson = file.readAsStringSync();
+    return Translator.fromJson(json.decode(strJson));
+  }
+
+  add(TranslateLanguage languagePair, {bool mergeData = true})
+  {
+    final existing = languages[languagePair.languagePairName];
+
+    if (mergeData && existing != null)
+    {
+      existing.merge(languagePair);
+    }
+    else
+    {
+      languages[languagePair.languagePairName] = languagePair;
+    }
+  }
+
+  Object toJson()
+  {
+    final lst = List.empty(growable: true);
+    for (final language in languages.values)
+    {
+      lst.add(language.toJson());
+    }
+    return {'version': 1, 'data': lst};
+  }
+
+  writeToFile(String fileName)
+  {
+    final jsonStr = json.encode(toJson());
+    final file = io.File(fileName);
+    file.writeAsStringSync(jsonStr);
+  }
+}

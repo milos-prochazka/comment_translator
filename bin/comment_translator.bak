@@ -14,7 +14,7 @@ import 'package:comment_translator/translate_base.dart';
 /// dldlsdlsdlsldsldslsl
 ''';
 
-void main(List<String> arguments) async
+void main(List<String> arguments) async 
 {
   /*var url = Uri.parse('https://api-free.deepl.com/v2/translate');
   var response = await http.post(url, body: {'auth_key': 'a1b66257-44e8-d72a-a7f3-e3a6bfee7c54:fx', 'text': 'kočka', 'target_lang' : 'en'});
