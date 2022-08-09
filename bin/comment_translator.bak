@@ -21,11 +21,6 @@ void main(List<String> arguments) async
   print('Response status: ${response.statusCode}');
   print('Response body: ${response.body}');*/
 
-  final l1 = CommentLine(r'ssdksdksdkl; //////  kocour ');
-  final l2 = CommentLine(r'ssdksdksdkl; //  ~ kocour ');
-  final l3 = CommentLine(r'ssdksdksdkl; //  ');
-  final l4 = CommentLine(r'ssdksdksdkl; //  ~~~ kokolek ~~~');
-
   final t = TranslateLanguage();
   t.destLanguage = 'en';
   t.sourceLanguage = 'cs';
